@@ -13,6 +13,8 @@ fn main() {
         })
         .count();
 
+    dbg!(result);
+
     // Part 2
     let result2: usize = input.lines()
         .filter(|line| {
@@ -26,6 +28,4 @@ fn main() {
         .count();
 
     dbg!(result2);
-
-    ()
 }
