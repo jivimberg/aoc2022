@@ -41,13 +41,8 @@ fn main() -> Result<(), Error> {
     input
         .map(parse_moves)
         .for_each(|(amount, from, to)| {
-            for _ in 0..amount {
-                let from = (from - 1) as usize;
-                let to = (to - 1) as usize;
-                let crate_being_moved = stacks[from].pop_back().expect("There was nothing to move");
-                stacks[to].push_back(crate_being_moved)
-            }
-            println!("{:?}", stacks);
+            //do_move_part1(&mut stacks, amount, from, to);
+            do_move_part2(&mut stacks, amount, from, to);
         });
 
 
@@ -60,6 +55,25 @@ fn main() -> Result<(), Error> {
     println!("{result}");
 
     Ok(())
+}
+
+fn do_move_part1(stacks: &mut [VecDeque<char>], amount: u32, from: u32, to: u32) {
+    for _ in 0..amount {
+        let from = (from - 1) as usize;
+        let to = (to - 1) as usize;
+        let crate_being_moved = stacks[from].pop_back().expect("There was nothing to move");
+        stacks[to].push_back(crate_being_moved)
+    }
+}
+
+fn do_move_part2(stacks: &mut [VecDeque<char>], amount: u32, from: u32, to: u32) {
+    let from = (from - 1) as usize;
+    let from_deque = &mut stacks[from];
+    let mut crates_being_moved = from_deque
+        .drain((from_deque.len() - amount as usize)..)
+        .collect::<VecDeque<char>>();
+    let to = (to - 1) as usize;
+    stacks[to].append(&mut crates_being_moved)
 }
 
 fn parse_crates_line(s: &str) -> Vec<Option<char>> {
