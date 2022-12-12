@@ -5,6 +5,7 @@ use itertools::Itertools;
 
 fn main() {
     let mut dirs: HashSet<Vec<String>> = HashSet::new();
+    dirs.insert(vec!["/".to_string()]); // insert root
     let mut filesystem: HashSet<File> = HashSet::new();
     let mut current_path: Vec<String> = vec![];
     for line in include_str!("my_input.txt").lines() {
@@ -33,8 +34,6 @@ fn main() {
         }
     }
 
-    filesystem.iter().for_each(|file| println!("{file}"));
-
     // a map of dir to size without counting recursive dirs
     let dir_partial_size_map: HashMap<Vec<String>, usize> = filesystem
         .iter()
@@ -43,7 +42,6 @@ fn main() {
 
     let mut dir_full_size_map: HashMap<Vec<String>, usize> = HashMap::new();
     for dir in dirs {
-        println!("/{}", dir[1..].join("/"));
         let full_size = dir_partial_size_map
             .iter()
             .filter(|(path, _)| path.starts_with(&dir))
@@ -51,8 +49,8 @@ fn main() {
         dir_full_size_map.insert(dir.clone(), full_size);
     }
 
-    dbg!(&dir_full_size_map.iter().sorted_by_key(|(path, _)|path.len()));
 
+    // Part 1
     let size_threshold = 100000;
     let result: usize = dir_full_size_map
         .values()
@@ -60,6 +58,23 @@ fn main() {
         .sum();
 
     dbg!(result);
+
+    // Part 2
+    dbg!(&dir_full_size_map);
+    let needed_space = 30000000;
+    let total_space = 70000000;
+    let used_space = dir_full_size_map
+        .get(&vec!["/".to_string()])
+        .expect("Root has to be there");
+    let space_to_free_up = needed_space - (total_space - used_space);
+
+    let (_dir_to_delete, size) = dir_full_size_map
+        .iter()
+        .sorted_by_key(|(_path, &size)| size)
+        .find(|(_path, &size)| size > space_to_free_up)
+        .expect("There has to be something we can delete");
+
+    dbg!(size);
 }
 
 #[derive(Debug, Eq, Hash, PartialEq)]
